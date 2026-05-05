@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block title %}Вхід{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-wrap {
+        max-width: 420px;
+        margin: 4rem auto 6rem;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-logo {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-logo span { color: var(--accent); }
+
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 36px;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        margin: 0 0 0.25rem;
+        line-height: 1;
+    }
+
+    .page-title em { font-style: italic; color: var(--accent); }
+
+    .login-sub {
+        font-size: 13px;
+        color: var(--ink-3);
+    }
+
+    /* CARD */
+    .login-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .login-card-body {
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* ERROR */
+    .error-banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fdf0f0;
+        border: 1px solid #f0b8b8;
+        border-radius: 8px;
+        padding: 11px 14px;
+        font-size: 13px;
+        color: #8a2020;
+    }
+
+    .error-banner i { font-size: 15px; flex-shrink: 0; }
+
+    /* FIELDS */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+
+    .field label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-2);
+        letter-spacing: 0.02em;
+    }
+
+    .field input {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        color: var(--ink);
+        background: var(--cream);
+        border: 1px solid var(--cream-3);
+        border-radius: 7px;
+        padding: 10px 12px;
+        outline: none;
+        transition: border-color 0.15s, background 0.15s;
+        width: 100%;
+    }
+
+    .field input::placeholder { color: var(--ink-3); }
+
+    .field input:focus {
+        border-color: var(--ink-3);
+        background: var(--white);
+    }
+
+    /* DIVIDER */
+    .divider {
+        height: 1px;
+        background: var(--cream-2);
+        margin: 0.25rem 0;
+    }
+
+    /* SUBMIT */
+    .btn-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 13px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s, transform 0.1s;
+        margin-top: 0.25rem;
+    }
+
+    .btn-login:hover { background: var(--accent); }
+    .btn-login:active { transform: scale(0.99); }
+
+    /* FOOTER */
+    .login-card-footer {
+        padding: 14px 1.75rem;
+        background: var(--cream);
+        border-top: 1px solid var(--cream-2);
+        text-align: center;
+        font-size: 12.5px;
+        color: var(--ink-3);
+    }
+
+    .login-card-footer a {
+        color: var(--ink);
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+
+    .login-card-footer a:hover { color: var(--accent); }
+
+    /* BACK */
+    .back-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 1rem;
+        font-size: 13px;
+        color: var(--ink-3);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--ink); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+
+    <div class="login-header">
+        <div class="login-logo">Книга<span>рня</span></div>
+        <h1 class="page-title">Вхід в <em>акаунт</em></h1>
+        <p class="login-sub">Раді бачити вас знову</p>
+    </div>
+
+    <div class="login-card">
+        <div class="login-card-body">
+
+            {% if form.errors %}
+            <div class="error-banner">
+                <i class="bi bi-exclamation-circle"></i>
+                Невірний логін або пароль. Спробуйте ще раз.
+            </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div style="display:flex; flex-direction:column; gap:0.875rem;">
+                    <div class="field">
+                        <label>Email / Логін</label>
+                        <input type="text" name="username"
+                               placeholder="ivan@example.com"
+                               autocomplete="username" required>
+                    </div>
+
+                    <div class="field">
+                        <label>Пароль</label>
+                        <input type="password" name="password"
+                               placeholder="••••••••"
+                               autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <div class="divider" style="margin-top:1.25rem;"></div>
+
+                <button type="submit" class="btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i> Увійти
+                </button>
+            </form>
+
+        </div>
+
+        <div class="login-card-footer">
+            Ще немає акаунту? Він створюється автоматично при <a href="{% url 'catalog' %}">першому замовленні</a>.
+        </div>
+    </div>
+
+    <a href="{% url 'catalog' %}" class="back-link">
+        <i class="bi bi-arrow-left"></i> До каталогу без входу
+    </a>
+
+</div>
+{% endblock %}

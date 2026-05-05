@@ -1,0 +1,377 @@
+{% extends 'catalog/admin/base_admin.html' %}
+{% block title %}Замовлення #{{ order.pk }}{% endblock %}
+{% block topbar_title %}Замовлення #{{ order.pk }}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'admin_orders' %}" class="topbar-btn topbar-btn-outline">
+    <i class="bi bi-arrow-left"></i> До замовлень
+</a>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    @media (max-width: 1000px) {
+        .order-layout { grid-template-columns: 1fr; }
+    }
+
+    .detail-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-card-header {
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+    }
+
+    .detail-rows { display: flex; flex-direction: column; }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 13.5px;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row-label { color: var(--ink-3); flex-shrink: 0; }
+    .detail-row-value { color: var(--ink); font-weight: 500; text-align: right; }
+
+    /* ORDER ITEMS */
+    .order-items { display: flex; flex-direction: column; }
+
+    .order-item {
+        display: grid;
+        grid-template-columns: 52px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--cream-2);
+    }
+
+    .order-item:last-child { border-bottom: none; }
+
+    .item-cover {
+        width: 52px;
+        aspect-ratio: 2 / 3;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--cream-2);
+        flex-shrink: 0;
+    }
+
+    .item-cover img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+    }
+
+    .item-cover-ph {
+        width: 100%; height: 100%;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--ink-3); font-size: 16px;
+    }
+
+    .item-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+    .item-title {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-author { font-size: 11.5px; color: var(--ink-3); }
+    .item-qty { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+    .item-subtotal {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+    }
+
+    .order-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 13px 16px;
+        background: var(--cream);
+        border-top: 1px solid var(--cream-2);
+    }
+
+    .order-total-label { font-size: 13px; color: var(--ink-3); }
+
+    .order-total-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+    }
+
+    .order-total-value small {
+        font-size: 14px;
+        color: var(--ink-3);
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    /* PRINT JOB */
+    .printjob-form {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .printjob-header {
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .printjob-header i { font-size: 14px; color: var(--ink-2); }
+
+    .printjob-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .printjob-footer {
+        padding: 13px 16px;
+        background: var(--cream);
+        border-top: 1px solid var(--cream-2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-layout">
+
+    <!-- ЛІВА: деталі замовлення -->
+    <div>
+        <!-- Список книг -->
+        <div class="detail-card">
+            <div class="detail-card-header">Склад замовлення</div>
+            <div class="order-items">
+                {% for item in order.items.all %}
+                <div class="order-item">
+                    <div class="item-cover">
+                        {% if item.book.cover %}
+                            <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}">
+                        {% else %}
+                            <div class="item-cover-ph"><i class="bi bi-book"></i></div>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <div class="item-title">{{ item.book.title }}</div>
+                        <div class="item-author">{{ item.book.author }}</div>
+                        <div class="item-qty">{{ item.quantity }} шт. × {{ item.price }} грн</div>
+                    </div>
+                    <div class="item-subtotal">{{ item.get_total_price }} грн</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="order-total-row">
+                <span class="order-total-label">Разом</span>
+                <span class="order-total-value">{{ order.get_total_price }} <small>грн</small></span>
+            </div>
+        </div>
+
+        <!-- Коментар -->
+        {% if order.comment %}
+        <div class="detail-card">
+            <div class="detail-card-header">Коментар покупця</div>
+            <div style="padding: 14px 16px; font-size: 13.5px; color: var(--ink-2); line-height: 1.6;">
+                {{ order.comment }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Завдання друку -->
+        <div class="printjob-form">
+            <div class="printjob-header">
+                <i class="bi bi-printer"></i> Виробниче завдання
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="printjob-body">
+
+                    <div class="field">
+                        <label>Статус замовлення</label>
+                        <select name="status">
+                            {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div style="height: 1px; background: var(--cream-2);"></div>
+
+                    <div class="field">
+                        <label>Статус друку</label>
+                        <select name="print_status">
+                            {% for value, label in print_status_choices %}
+                            <option value="{{ value }}" {% if print_job.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="fields-row">
+                        <div class="field">
+                            <label>Початок друку</label>
+                            <input type="datetime-local" name="started_at"
+                                   value="{% if print_job.started_at %}{{ print_job.started_at|date:'Y-m-d' }}T{{ print_job.started_at|date:'H:i' }}{% endif %}">
+                        </div>
+                        <div class="field">
+                            <label>Завершення друку</label>
+                            <input type="datetime-local" name="finished_at"
+                                   value="{% if print_job.finished_at %}{{ print_job.finished_at|date:'Y-m-d' }}T{{ print_job.finished_at|date:'H:i' }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Примітки виробництва</label>
+                        <textarea name="notes" rows="3"
+                                  placeholder="Особливі вимоги, нотатки...">{{ print_job.notes }}</textarea>
+                    </div>
+
+                </div>
+                <div class="printjob-footer">
+                    <button type="submit" class="btn-save" style="width: 100%; justify-content: center;">
+                        <i class="bi bi-check-lg"></i> Зберегти зміни
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ПРАВА: інфо про покупця -->
+    <div style="display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 72px;">
+
+        <!-- Інфо про замовлення -->
+        <div class="detail-card" style="margin-bottom: 0;">
+            <div class="detail-card-header">Замовлення</div>
+            <div class="detail-rows">
+                <div class="detail-row">
+                    <span class="detail-row-label">Номер</span>
+                    <span class="detail-row-value">#{{ order.pk }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Статус</span>
+                    <span class="detail-row-value">
+                        <span class="status-badge status-{{ order.status }}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ order.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Друк</span>
+                    <span class="detail-row-value">
+                        <span class="status-badge pj-{{ print_job.status }}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ print_job.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Створено</span>
+                    <span class="detail-row-value">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Оновлено</span>
+                    <span class="detail-row-value">{{ order.updated_at|date:"d.m.Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Інфо про покупця -->
+        <div class="detail-card" style="margin-bottom: 0;">
+            <div class="detail-card-header">Покупець</div>
+            <div class="detail-rows">
+                <div class="detail-row">
+                    <span class="detail-row-label">Ім'я</span>
+                    <span class="detail-row-value">
+                        {{ order.user.get_full_name|default:order.user.username }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Email</span>
+                    <span class="detail-row-value" style="font-size: 12.5px;">
+                        {{ order.user.email }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Телефон</span>
+                    <span class="detail-row-value">
+                        {{ order.user.profile.phone|default:'—' }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row-label">Адреса</span>
+                    <span class="detail-row-value" style="font-size: 12.5px;">
+                        {{ order.user.profile.address|default:'—' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {% if print_job.started_at or print_job.finished_at %}
+        <div class="detail-card" style="margin-bottom: 0;">
+            <div class="detail-card-header">Хронологія друку</div>
+            <div class="detail-rows">
+                {% if print_job.started_at %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Початок</span>
+                    <span class="detail-row-value">{{ print_job.started_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                {% endif %}
+                {% if print_job.finished_at %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Завершення</span>
+                    <span class="detail-row-value">{{ print_job.finished_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

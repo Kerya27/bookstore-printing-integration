@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% block title %}Кошик{% endblock %}
+
+{% block extra_css %}
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--ink-3);
+        text-decoration: none;
+        margin-bottom: 2rem;
+        transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--ink); }
+
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(32px, 4vw, 48px);
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--ink);
+        margin: 0 0 2.5rem;
+    }
+
+    .page-title em {
+        font-style: italic;
+        color: var(--accent);
+    }
+
+    /* LAYOUT */
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 2rem;
+        align-items: start;
+        padding-bottom: 4rem;
+    }
+
+    @media (max-width: 900px) {
+        .cart-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ITEMS */
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: var(--cream-3);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .cart-item {
+        display: grid;
+        grid-template-columns: 70px 1fr auto;
+        gap: 1rem;
+        align-items: center;
+        background: var(--white);
+        padding: 16px;
+        transition: background 0.15s;
+    }
+
+    .cart-item:hover { background: var(--cream); }
+
+    /* Cover thumbnail */
+    .item-cover {
+        width: 70px;
+        aspect-ratio: 2 / 3;
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--cream-2);
+        flex-shrink: 0;
+    }
+
+    .item-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+    }
+
+    .item-cover-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-3);
+        font-size: 20px;
+    }
+
+    /* Info */
+    .item-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .item-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-title:hover { color: var(--accent); }
+
+    .item-author {
+        font-size: 12px;
+        color: var(--ink-3);
+    }
+
+    .item-price-unit {
+        font-size: 12px;
+        color: var(--ink-3);
+        margin-top: 4px;
+    }
+
+    /* Controls */
+    .item-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .item-subtotal {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+    }
+
+    .qty-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid var(--cream-3);
+        background: var(--white);
+        color: var(--ink-2);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.15s;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .qty-btn:hover {
+        border-color: var(--ink-3);
+        color: var(--ink);
+        background: var(--cream);
+    }
+
+    .qty-value {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .btn-remove {
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--ink-3);
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-remove:hover { color: #c0392b; }
+
+    /* SUMMARY */
+    .cart-summary {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: sticky;
+        top: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .summary-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
+    .summary-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 1rem 0;
+        border-top: 1px solid var(--cream-2);
+        border-bottom: 1px solid var(--cream-2);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13.5px;
+    }
+
+    .summary-row .label { color: var(--ink-3); }
+    .summary-row .value { color: var(--ink); font-weight: 500; }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .total-label {
+        font-size: 14px;
+        color: var(--ink-2);
+    }
+
+    .total-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 36px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        line-height: 1;
+    }
+
+    .total-value small {
+        font-size: 16px;
+        color: var(--ink-3);
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-checkout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 24px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+        letter-spacing: 0.01em;
+    }
+
+    .btn-checkout:hover {
+        background: var(--accent);
+        color: var(--white);
+        text-decoration: none;
+    }
+
+    .summary-note {
+        font-size: 11.5px;
+        color: var(--ink-3);
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    /* EMPTY */
+    .cart-empty {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--ink-3);
+    }
+
+    .cart-empty i {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .cart-empty p {
+        font-size: 15px;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-to-catalog {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-size: 13.5px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-to-catalog:hover {
+        background: var(--accent);
+        color: var(--white);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'catalog' %}" class="back-link">
+    <i class="bi bi-arrow-left"></i> Продовжити покупки
+</a>
+
+<h1 class="page-title">Ваш <em>кошик</em></h1>
+
+{% if books %}
+<div class="cart-layout">
+
+    <!-- Список книг -->
+    <div class="cart-items">
+        {% for item in books %}
+        <div class="cart-item">
+
+            <div class="item-cover">
+                {% if item.book.cover %}
+                    <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}">
+                {% else %}
+                    <div class="item-cover-placeholder">
+                        <i class="bi bi-book"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="item-info">
+                <a href="{% url 'book_detail' item.book.pk %}" class="item-title">
+                    {{ item.book.title }}
+                </a>
+                <span class="item-author">{{ item.book.author }}</span>
+                <span class="item-price-unit">{{ item.book.price }} грн / шт.</span>
+            </div>
+
+            <div class="item-controls">
+                <span class="item-subtotal">{{ item.subtotal }} грн</span>
+
+                <div class="qty-row">
+                    <a href="{% url 'remove_from_cart' item.book.pk %}" class="qty-btn">−</a>
+                    <span class="qty-value">{{ item.quantity }}</span>
+                    <a href="{% url 'add_to_cart' item.book.pk %}" class="qty-btn">+</a>
+                </div>
+
+                <a href="{% url 'remove_from_cart_all' item.book.pk %}" class="btn-remove">
+                    <i class="bi bi-trash"></i> Видалити
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Підсумок -->
+    <div class="cart-summary">
+        <p class="summary-title">Підсумок</p>
+
+        <div class="summary-rows">
+            <div class="summary-row">
+                <span class="label">Товарів</span>
+                <span class="value">{{ books|length }} шт.</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Доставка</span>
+                <span class="value">за тарифом</span>
+            </div>
+        </div>
+
+        <div class="summary-total">
+            <span class="total-label">Разом</span>
+            <span class="total-value">{{ total }} <small>грн</small></span>
+        </div>
+
+        <a href="{% url 'checkout' %}" class="btn-checkout">
+            <i class="bi bi-bag-check"></i> Оформити замовлення
+        </a>
+
+        <p class="summary-note">
+            Оплата при отриманні або онлайн.<br>
+            Доставка по всій Україні.
+        </p>
+    </div>
+
+</div>
+
+{% else %}
+<div class="cart-empty">
+    <i class="bi bi-bag"></i>
+    <p>У кошику поки що нічого немає.</p>
+    <a href="{% url 'catalog' %}" class="btn-to-catalog">
+        <i class="bi bi-arrow-left"></i> До каталогу
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

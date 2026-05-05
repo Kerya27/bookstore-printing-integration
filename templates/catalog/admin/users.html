@@ -1,0 +1,390 @@
+<!-- templates/catalog/admin/users.html -->
+{% extends 'catalog/admin/base_admin.html' %}
+{% block title %}Користувачі{% endblock %}
+{% block topbar_title %}Користувачі{% endblock %}
+
+{% block topbar_actions %}
+<form method="get" action="{% url 'admin_users' %}">
+    <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Пошук користувача...">
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(26,24,20,0.5);
+        z-index: 200;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 1rem;
+    }
+
+    .user-modal-overlay.open { display: flex; }
+
+    .user-drawer {
+        background: var(--white);
+        border-radius: 12px;
+        width: 380px;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        margin-top: 56px;
+    }
+
+    .drawer-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--cream-2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background: var(--white);
+        z-index: 1;
+    }
+
+    .drawer-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+    }
+
+    .drawer-close {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid var(--cream-3);
+        background: transparent;
+        color: var(--ink-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.15s;
+    }
+
+    .drawer-close:hover { border-color: var(--ink-3); color: var(--ink); }
+
+    .drawer-body {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .drawer-section-label {
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 0.25rem;
+    }
+
+    .drawer-info-rows {
+        background: var(--cream);
+        border: 1px solid var(--cream-3);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .drawer-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 13px;
+    }
+
+    .drawer-info-row:last-child { border-bottom: none; }
+    .drawer-info-label { color: var(--ink-3); flex-shrink: 0; }
+    .drawer-info-value { color: var(--ink); font-weight: 500; text-align: right; word-break: break-word; }
+
+    .drawer-orders {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .drawer-order-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: var(--cream);
+        border: 1px solid var(--cream-3);
+        border-radius: 8px;
+        text-decoration: none;
+        transition: border-color 0.15s;
+        gap: 8px;
+    }
+
+    .drawer-order-item:hover { border-color: var(--ink-3); }
+
+    .drawer-order-num {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+    .drawer-order-date { font-size: 11.5px; color: var(--ink-3); }
+
+    .drawer-order-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .drawer-order-price {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+    }
+
+    .user-avatar-lg {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--cream-2);
+        border: 1px solid var(--cream-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-3);
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .staff-badge {
+        font-size: 10px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 100px;
+        background: #faeeda;
+        color: #854f0b;
+        border: 1px solid #ef9f27;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="table-wrap">
+    <div class="table-header">
+        <span class="table-title">Всього користувачів — {{ users|length }}</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Користувач</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Замовлень</th>
+                <th>Витрачено</th>
+                <th>Дата реєстрації</th>
+                <th>Роль</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--cream-2); border: 1px solid var(--cream-3); display: flex; align-items: center; justify-content: center; color: var(--ink-3); font-size: 14px; flex-shrink: 0;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 13.5px; font-weight: 500; color: var(--ink);">
+                                {{ user.get_full_name|default:user.username }}
+                            </div>
+                            {% if user.get_full_name %}
+                            <div style="font-size: 11px; color: var(--ink-3);">{{ user.username }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+
+                <td style="font-size: 13px; color: var(--ink-2);">{{ user.email|default:'—' }}</td>
+
+                <td style="font-size: 13px; color: var(--ink-2);">
+                    {% if user.profile %}{{ user.profile.phone|default:'—' }}{% else %}—{% endif %}
+                </td>
+
+                <td>
+                    <span style="font-size: 13px; font-weight: 500; color: var(--ink);">
+                        {{ user.orders.count }}
+                    </span>
+                </td>
+
+                <td style="font-weight: 500; font-size: 13px;">
+                    {% with total=0 %}
+                        {% for order in user.orders.all %}
+                            {% with t=order.get_total_price %}{% endwith %}
+                        {% endfor %}
+                        {{ user.orders.all|length|default:0 }}
+                    {% endwith %}
+                    —
+                </td>
+
+                <td style="font-size: 12px; color: var(--ink-3);">
+                    {{ user.date_joined|date:"d.m.Y" }}
+                </td>
+
+                <td>
+                    {% if user.is_staff %}
+                        <span class="staff-badge">Адмін</span>
+                    {% else %}
+                        <span style="font-size: 12px; color: var(--ink-3);">Покупець</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <button class="btn-icon" title="Деталі"
+                            onclick="openUserDrawer(
+                                '{{ user.get_full_name|default:user.username|escapejs }}',
+                                '{{ user.username|escapejs }}',
+                                '{{ user.email|default:''|escapejs }}',
+                                '{% if user.profile %}{{ user.profile.phone|default:''|escapejs }}{% endif %}',
+                                '{% if user.profile %}{{ user.profile.address|default:''|escapejs }}{% endif %}',
+                                '{{ user.date_joined|date:'d.m.Y' }}',
+                                {{ user.is_staff|yesno:'true,false' }},
+                                [{% for order in user.orders.all %}{id:{{ order.pk }},date:'{{ order.created_at|date:'d.m.Y' }}',status:'{{ order.status }}',status_display:'{{ order.get_status_display|escapejs }}',total:'{{ order.get_total_price }}'}{% if not forloop.last %},{% endif %}{% endfor %}]
+                            )">
+                        <i class="bi bi-person"></i>
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">
+                    <div class="empty-state">
+                        <i class="bi bi-people"></i>
+                        <p>Користувачів не знайдено</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- User Drawer -->
+<div class="user-modal-overlay" id="userDrawer" onclick="closeUserDrawer(event)">
+    <div class="user-drawer">
+        <div class="drawer-header">
+            <span class="drawer-title" id="drawerName">—</span>
+            <button class="drawer-close" onclick="closeUserDrawer()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="drawer-body">
+
+            <div>
+                <div class="drawer-section-label">Контакти</div>
+                <div class="drawer-info-rows">
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Логін</span>
+                        <span class="drawer-info-value" id="drawerUsername">—</span>
+                    </div>
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Email</span>
+                        <span class="drawer-info-value" id="drawerEmail">—</span>
+                    </div>
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Телефон</span>
+                        <span class="drawer-info-value" id="drawerPhone">—</span>
+                    </div>
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Адреса</span>
+                        <span class="drawer-info-value" id="drawerAddress">—</span>
+                    </div>
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Реєстрація</span>
+                        <span class="drawer-info-value" id="drawerJoined">—</span>
+                    </div>
+                    <div class="drawer-info-row">
+                        <span class="drawer-info-label">Роль</span>
+                        <span class="drawer-info-value" id="drawerRole">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="drawer-section-label">Замовлення</div>
+                <div class="drawer-orders" id="drawerOrders"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const statusColors = {
+    new:       'status-new',
+    confirmed: 'status-confirmed',
+    printing:  'status-printing',
+    ready:     'status-ready',
+    shipped:   'status-shipped',
+    delivered: 'status-delivered',
+};
+
+function openUserDrawer(name, username, email, phone, address, joined, isStaff, orders) {
+    document.getElementById('drawerName').textContent = name;
+    document.getElementById('drawerUsername').textContent = username || '—';
+    document.getElementById('drawerEmail').textContent = email || '—';
+    document.getElementById('drawerPhone').textContent = phone || '—';
+    document.getElementById('drawerAddress').textContent = address || '—';
+    document.getElementById('drawerJoined').textContent = joined;
+    document.getElementById('drawerRole').textContent = isStaff ? 'Адміністратор' : 'Покупець';
+
+    const container = document.getElementById('drawerOrders');
+    if (orders.length === 0) {
+        container.innerHTML = '<div style="font-size:13px; color: var(--ink-3); padding: 12px 0;">Замовлень немає</div>';
+    } else {
+        container.innerHTML = orders.map(o => `
+            <a href="/admin-panel/orders/${o.id}/" class="drawer-order-item">
+                <div>
+                    <div class="drawer-order-num">#${o.id}</div>
+                    <div class="drawer-order-date">${o.date}</div>
+                </div>
+                <div class="drawer-order-right">
+                    <span class="drawer-order-price">${o.total} грн</span>
+                    <span class="status-badge ${statusColors[o.status] || ''}">
+                        <i class="bi bi-circle-fill" style="font-size:6px;"></i>
+                        ${o.status_display}
+                    </span>
+                </div>
+            </a>
+        `).join('');
+    }
+
+    document.getElementById('userDrawer').classList.add('open');
+}
+
+function closeUserDrawer(e) {
+    if (!e || e.target === document.getElementById('userDrawer')) {
+        document.getElementById('userDrawer').classList.remove('open');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+{% block title %}Особистий кабінет{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(32px, 4vw, 48px);
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--ink);
+        margin: 0 0 2.5rem;
+    }
+
+    .page-title em { font-style: italic; color: var(--accent); }
+
+    /* LAYOUT */
+    .cabinet-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        align-items: start;
+        padding-bottom: 4rem;
+    }
+
+    @media (max-width: 860px) {
+        .cabinet-layout { grid-template-columns: 1fr; }
+    }
+
+    /* SIDEBAR */
+    .cabinet-sidebar {
+        position: sticky;
+        top: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .profile-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .profile-card-header {
+        padding: 16px;
+        border-bottom: 1px solid var(--cream-2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .profile-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--cream-2);
+        border: 1px solid var(--cream-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-3);
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .profile-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+    }
+
+    .profile-role {
+        font-size: 11px;
+        color: var(--ink-3);
+        margin-top: 1px;
+    }
+
+    .profile-rows {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profile-row {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--cream-2);
+    }
+
+    .profile-row:last-child { border-bottom: none; }
+
+    .profile-row-label {
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+    }
+
+    .profile-row-value {
+        font-size: 13.5px;
+        color: var(--ink);
+        word-break: break-word;
+    }
+
+    .profile-row-value.empty { color: var(--ink-3); font-style: italic; }
+
+    .btn-edit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 11px;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink-2);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        text-decoration: none;
+        border: 1px solid var(--cream-3);
+        transition: all 0.15s;
+    }
+
+    .btn-edit:hover { border-color: var(--ink-3); color: var(--ink); }
+
+    .btn-catalog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 11px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        transition: background 0.15s;
+    }
+
+    .btn-catalog:hover { background: var(--accent); color: var(--white); }
+
+    /* ORDERS */
+    .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 1rem;
+    }
+
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .order-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .order-card:hover {
+        box-shadow: 0 6px 24px rgba(26,24,20,0.08);
+        color: inherit;
+    }
+
+    .order-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        gap: 12px;
+    }
+
+    .order-number {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+    }
+
+    .order-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .order-date {
+        font-size: 12px;
+        color: var(--ink-3);
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 100px;
+        white-space: nowrap;
+    }
+
+    .status-badge i { font-size: 6px; }
+
+    .status-new      { background: #f1f0ee; color: #5f5e5a; border: 1px solid #d3d1c7; }
+    .status-confirmed{ background: #e6f1fb; color: #185fa5; border: 1px solid #85b7eb; }
+    .status-printing { background: #faeeda; color: #854f0b; border: 1px solid #ef9f27; }
+    .status-ready    { background: #e1f5ee; color: #0f6e56; border: 1px solid #5dcaa5; }
+    .status-shipped  { background: #e6f1fb; color: #185fa5; border: 1px solid #85b7eb; }
+    .status-delivered{ background: #eaf3de; color: #3b6d11; border: 1px solid #97c459; }
+
+    /* Order items inside card */
+    .order-card-items {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .order-card-item {
+        display: grid;
+        grid-template-columns: 44px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--cream-2);
+    }
+
+    .order-card-item:last-child { border-bottom: none; }
+
+    .item-thumb {
+        width: 44px;
+        aspect-ratio: 2 / 3;
+        border-radius: 4px;
+        overflow: hidden;
+        background: var(--cream-2);
+        flex-shrink: 0;
+    }
+
+    .item-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+    }
+
+    .item-thumb-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-3);
+        font-size: 14px;
+    }
+
+    .item-title-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+    .item-title-text {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-qty { font-size: 11.5px; color: var(--ink-3); }
+
+    .item-price {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+    }
+
+    .order-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 16px;
+        background: var(--cream);
+        border-top: 1px solid var(--cream-2);
+    }
+
+    .order-footer-link {
+        font-size: 12px;
+        color: var(--ink-3);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.15s;
+    }
+
+    .order-footer-link:hover { color: var(--accent); }
+
+    .order-total {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+    }
+
+    .order-total small {
+        font-size: 11px;
+        color: var(--ink-3);
+        font-weight: 400;
+    }
+
+    /* Empty */
+    .orders-empty {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: var(--ink-3);
+    }
+
+    .orders-empty i { font-size: 36px; display: block; margin-bottom: 1rem; opacity: 0.4; }
+    .orders-empty p { font-size: 14px; margin-bottom: 1.25rem; }
+
+    .btn-to-catalog-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 20px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.15s;
+    }
+
+    .btn-to-catalog-sm:hover { background: var(--accent); color: var(--white); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">Особистий <em>кабінет</em></h1>
+
+<div class="cabinet-layout">
+
+    <!-- Sidebar: профіль -->
+    <div class="cabinet-sidebar">
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <div class="profile-avatar">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <div class="profile-name">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </div>
+                    <div class="profile-role">Покупець</div>
+                </div>
+            </div>
+
+            <div class="profile-rows">
+                <div class="profile-row">
+                    <span class="profile-row-label">Email</span>
+                    <span class="profile-row-value">{{ request.user.email|default:'—' }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-row-label">Телефон</span>
+                    <span class="profile-row-value {% if not request.user.profile.phone %}empty{% endif %}">
+                        {{ request.user.profile.phone|default:'не вказано' }}
+                    </span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-row-label">Адреса</span>
+                    <span class="profile-row-value {% if not request.user.profile.address %}empty{% endif %}">
+                        {{ request.user.profile.address|default:'не вказано' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'cabinet_edit' %}" class="btn-edit">
+            <i class="bi bi-pencil"></i> Редагувати профіль
+        </a>
+        <a href="{% url 'catalog' %}" class="btn-catalog">
+            <i class="bi bi-arrow-left"></i> До каталогу
+        </a>
+    </div>
+
+    <!-- Orders -->
+    <div>
+        <p class="section-label">Мої замовлення</p>
+
+        {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card">
+
+                <div class="order-card-header">
+                    <span class="order-number">Замовлення #{{ order.pk }}</span>
+                    <div class="order-meta">
+                        <span class="order-date">{{ order.created_at|date:"d.m.Y, H:i" }}</span>
+                        <span class="status-badge
+                            {% if order.status == 'new' %}status-new
+                            {% elif order.status == 'confirmed' %}status-confirmed
+                            {% elif order.status == 'printing' %}status-printing
+                            {% elif order.status == 'ready' %}status-ready
+                            {% elif order.status == 'shipped' %}status-shipped
+                            {% elif order.status == 'delivered' %}status-delivered
+                            {% endif %}">
+                            <i class="bi bi-circle-fill"></i>
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="order-card-items">
+                    {% for item in order.items.all %}
+                    <div class="order-card-item">
+                        <div class="item-thumb">
+                            {% if item.book.cover %}
+                                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}">
+                            {% else %}
+                                <div class="item-thumb-placeholder">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="item-title-wrap">
+                            <span class="item-title-text">{{ item.book.title }}</span>
+                            <span class="item-qty">{{ item.quantity }} шт.</span>
+                        </div>
+                        <span class="item-price">{{ item.get_total_price }} грн</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="order-card-footer">
+                    <a href="{% url 'order_detail' order.pk %}" class="order-footer-link">
+                        Деталі <i class="bi bi-arrow-right"></i>
+                    </a>
+                    <span class="order-total">
+                        {{ order.get_total_price }} <small>грн</small>
+                    </span>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="orders-empty">
+            <i class="bi bi-bag"></i>
+            <p>У вас ще немає замовлень.</p>
+            <a href="{% url 'catalog' %}" class="btn-to-catalog-sm">
+                Перейти до каталогу
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

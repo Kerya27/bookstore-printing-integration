@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+{% block title %}Замовлення #{{ order.pk }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(32px, 4vw, 48px);
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--ink);
+        margin: 0 0 2rem;
+    }
+
+    .page-title em { font-style: italic; color: var(--accent); }
+
+    /* SUCCESS BANNER */
+    .success-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #eef7f1;
+        border: 1px solid #b8dfc6;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 2.5rem;
+    }
+
+    .success-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #5a9e6f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .success-text strong {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #2d6a45;
+        margin-bottom: 2px;
+    }
+
+    .success-text span {
+        font-size: 12.5px;
+        color: #4a8c62;
+    }
+
+    /* LAYOUT */
+    .order-layout {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 2rem;
+        align-items: start;
+        padding-bottom: 4rem;
+    }
+
+    @media (max-width: 860px) {
+        .order-layout { grid-template-columns: 1fr; }
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 1rem;
+    }
+
+    /* ITEMS */
+    .order-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: var(--cream-3);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .order-item {
+        display: grid;
+        grid-template-columns: 56px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        background: var(--white);
+        padding: 14px 16px;
+    }
+
+    .order-item-cover {
+        width: 56px;
+        aspect-ratio: 2 / 3;
+        border-radius: 5px;
+        overflow: hidden;
+        background: var(--cream-2);
+        flex-shrink: 0;
+    }
+
+    .order-item-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+    }
+
+    .order-item-cover-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink-3);
+        font-size: 18px;
+    }
+
+    .order-item-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+    .order-item-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .order-item-author { font-size: 11.5px; color: var(--ink-3); }
+
+    .order-item-qty { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+
+    .order-item-subtotal {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
+        letter-spacing: -0.02em;
+    }
+
+    .order-total-row {
+        background: var(--cream);
+        border: 1px solid var(--cream-3);
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .order-total-label { font-size: 13px; color: var(--ink-3); }
+
+    .order-total-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        line-height: 1;
+    }
+
+    .order-total-value small {
+        font-size: 14px;
+        color: var(--ink-3);
+        font-weight: 400;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+    /* SIDEBAR */
+    .order-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        position: sticky;
+        top: 80px;
+    }
+
+    .info-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .info-card-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+    }
+
+    .info-rows {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 13px;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-row-label { color: var(--ink-3); flex-shrink: 0; }
+    .info-row-value { color: var(--ink); font-weight: 500; text-align: right; }
+
+    /* Status badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 100px;
+        background: #eef7f1;
+        color: #2d6a45;
+        border: 1px solid #b8dfc6;
+    }
+
+    .status-badge.pending { background: #fef8ec; color: #92610a; border-color: #f5d48a; }
+    .status-badge.cancelled { background: #fdf0f0; color: #8a2020; border-color: #f0b8b8; }
+
+    /* Comment block */
+    .comment-block {
+        background: var(--cream);
+        border: 1px solid var(--cream-3);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: var(--ink-2);
+        line-height: 1.5;
+    }
+
+    /* CTA */
+    .btn-catalog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--white);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13.5px;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        transition: background 0.15s;
+    }
+
+    .btn-catalog:hover { background: var(--accent); color: var(--white); }
+
+    .btn-cabinet {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--ink-3);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        text-decoration: none;
+        border: 1px solid var(--cream-3);
+        transition: all 0.15s;
+    }
+
+    .btn-cabinet:hover { border-color: var(--ink-3); color: var(--ink); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+    {% if 'success' in message.tags %}
+    <div class="success-banner">
+        <div class="success-icon"><i class="bi bi-check-lg"></i></div>
+        <div class="success-text">
+            <strong>Замовлення успішно оформлено!</strong>
+            <span>Ми зв'яжемося з вами найближчим часом.</span>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+{% endif %}
+
+<h1 class="page-title">Замовлення <em>#{{ order.pk }}</em></h1>
+
+<div class="order-layout">
+
+    <!-- Список книг -->
+    <div>
+        <p class="section-label">Склад замовлення</p>
+
+        <div class="order-items">
+            {% for item in order.items.all %}
+            <div class="order-item">
+                <div class="order-item-cover">
+                    {% if item.book.cover %}
+                        <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}">
+                    {% else %}
+                        <div class="order-item-cover-placeholder">
+                            <i class="bi bi-book"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="order-item-info">
+                    <div class="order-item-title">{{ item.book.title }}</div>
+                    <div class="order-item-author">{{ item.book.author }}</div>
+                    <div class="order-item-qty">{{ item.quantity }} шт. × {{ item.price }} грн</div>
+                </div>
+
+                <div class="order-item-subtotal">{{ item.get_total_price }} грн</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="order-total-row">
+            <span class="order-total-label">Разом до сплати</span>
+            <span class="order-total-value">{{ order.get_total_price }} <small>грн</small></span>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="order-sidebar">
+
+        <div class="info-card">
+            <div class="info-card-header">Інформація</div>
+            <div class="info-rows">
+                <div class="info-row">
+                    <span class="info-row-label">Статус</span>
+                    <span class="info-row-value">
+                        <span class="status-badge {% if order.status == 'new' %}{% elif order.status == 'cancelled' %}cancelled{% else %}pending{% endif %}">
+                            <i class="bi bi-circle-fill" style="font-size:6px;"></i>
+                            {{ order.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-row-label">Дата</span>
+                    <span class="info-row-value">{{ order.created_at|date:"d.m.Y" }}<br>
+                        <span style="font-weight:400; color: var(--ink-3); font-size:12px;">{{ order.created_at|date:"H:i" }}</span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-row-label">Покупець</span>
+                    <span class="info-row-value">{{ order.user.get_full_name|default:order.user.username }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if order.comment %}
+        <div>
+            <p class="section-label" style="margin-bottom: 0.5rem;">Коментар</p>
+            <div class="comment-block">{{ order.comment }}</div>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'catalog' %}" class="btn-catalog">
+            <i class="bi bi-arrow-left"></i> До каталогу
+        </a>
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'cabinet' %}" class="btn-cabinet">
+            <i class="bi bi-person"></i> Мої замовлення
+        </a>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

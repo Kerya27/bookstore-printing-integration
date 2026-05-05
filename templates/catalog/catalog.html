@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+{% block title %}Каталог книг{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--ink);
+        margin: 0;
+    }
+
+    .page-title em {
+        font-style: italic;
+        color: var(--accent);
+    }
+
+    .book-count {
+        font-size: 13px;
+        color: var(--ink-3);
+        padding-bottom: 4px;
+        margin: 0;
+    }
+
+    /* FILTERS */
+    .filter-strip {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--cream-3);
+        padding-bottom: 1.25rem;
+    }
+
+    .filter-pill {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        padding: 6px 16px;
+        border-radius: 100px;
+        border: 1px solid var(--cream-3);
+        background: var(--white);
+        color: var(--ink-2);
+        text-decoration: none;
+        transition: all 0.15s;
+        display: inline-block;
+    }
+
+    .filter-pill:hover {
+        border-color: var(--ink-3);
+        color: var(--ink);
+    }
+
+    .filter-pill.active {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--white);
+    }
+
+    /* GRID */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding-bottom: 3rem;
+    }
+
+    /* CARD — повністю посилання */
+    .book-card {
+        background: var(--white);
+        border: 1px solid var(--cream-3);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(26, 24, 20, 0.12);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    /* ОБКЛАДИНКА — книжка в повний зріст */
+    .book-cover {
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        background: var(--cream-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        transition: transform 0.35s ease;
+        display: block;
+    }
+
+    .book-card:hover .book-cover img {
+        transform: scale(1.04);
+    }
+
+    .book-cover-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.3;
+        color: var(--ink);
+    }
+
+    .book-cover-placeholder i { font-size: 36px; }
+    .book-cover-placeholder span { font-size: 11px; }
+
+    .badge-category {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        padding: 4px 10px;
+        border-radius: 100px;
+        background: rgba(253, 252, 249, 0.93);
+        color: var(--ink-2);
+        border: 1px solid var(--cream-3);
+    }
+
+    /* INFO */
+    .book-body {
+        padding: 14px 14px 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .book-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+    }
+
+    .book-author {
+        font-size: 12px;
+        color: var(--ink-3);
+    }
+
+    .book-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px 14px;
+        margin-top: 10px;
+    }
+
+    .book-price {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+    }
+
+    .book-price small {
+        font-size: 11px;
+        color: var(--ink-3);
+        font-weight: 400;
+    }
+
+    .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    }
+
+    .sort-label {
+        font-size: 12px;
+        color: var(--ink-3);
+        white-space: nowrap;
+    }
+
+    .sort-pills {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .sort-pill {
+        font-size: 12.5px;
+        padding: 5px 14px;
+        border-radius: 100px;
+        border: 1px solid var(--cream-3);
+        background: var(--white);
+        color: var(--ink-2);
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+
+    .sort-pill:hover {
+        border-color: var(--ink-3);
+        color: var(--ink);
+    }
+
+    .sort-pill.active {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--white);
+    }
+    /* EMPTY */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--ink-3);
+    }
+    .btn-cart-quick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    background: var(--ink);
+    color: var(--white);
+    text-decoration: none;
+    font-size: 15px;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+}
+
+    .btn-cart-quick:hover {
+        background: var(--accent);
+        color: var(--white);
+        transform: scale(1.05);
+    }
+
+    .btn-cart-quick:active { transform: scale(0.95); }
+
+    .empty-state i { font-size: 40px; margin-bottom: 1rem; display: block; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Каталог <em>книг</em></h1>
+    <p class="book-count">{{ books|length }} видань</p>
+</div>
+
+<div class="filter-strip">
+    <a href="{% url 'catalog' %}"
+       class="filter-pill {% if not current_category %}active{% endif %}">
+        Всі
+    </a>
+    {% for category in categories %}
+    <a href="{% url 'catalog' %}?category={{ category.slug }}"
+       class="filter-pill {% if current_category == category %}active{% endif %}">
+        {{ category.name }}
+    </a>
+    {% endfor %}
+</div>
+<div class="sort-bar">
+    <span class="sort-label">Сортування:</span>
+    <div class="sort-pills">
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort="
+           class="sort-pill {% if not current_sort %}active{% endif %}">Новинки</a>
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=price_asc"
+           class="sort-pill {% if current_sort == 'price_asc' %}active{% endif %}">Ціна ↑</a>
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=price_desc"
+           class="sort-pill {% if current_sort == 'price_desc' %}active{% endif %}">Ціна ↓</a>
+        <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=title"
+           class="sort-pill {% if current_sort == 'title' %}active{% endif %}">А → Я</a>
+    </div>
+</div>
+<div class="books-grid">
+    {% for book in books %}
+    <a href="{% url 'book_detail' book.pk %}" class="book-card">
+
+        <div class="book-cover">
+            {% if book.cover %}
+                <img src="{{ book.cover.url }}" alt="{{ book.title }}">
+            {% else %}
+                <div class="book-cover-placeholder">
+                    <i class="bi bi-book"></i>
+                    <span>Немає обкладинки</span>
+                </div>
+            {% endif %}
+            {% if book.category %}
+                <span class="badge-category">{{ book.category.name }}</span>
+            {% endif %}
+        </div>
+
+        <div class="book-body">
+            <div class="book-title">{{ book.title }}</div>
+            <div class="book-author">{{ book.author }}</div>
+        </div>
+
+        <div class="book-footer">
+            <div class="book-price">{{ book.price }} <small>грн</small></div>
+            <button class="btn-cart-quick" onclick="addToCart(event, {{ book.pk }}, this)">
+                <i class="bi bi-bag-plus"></i>
+            </button>
+        </div>
+
+    </a>
+    {% empty %}
+    <div class="empty-state">
+        <i class="bi bi-search"></i>
+        <p>Книг не знайдено.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function addToCart(e, pk, btn) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    fetch(`/cart/add-ajax/${pk}/`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                // Анімація кнопки
+                btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                btn.style.background = '#5a9e6f';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="bi bi-bag-plus"></i>';
+                    btn.style.background = '';
+                }, 1200);
+
+                // Оновлюємо лічильник в навбарі
+                const badge = document.querySelector('.navbar-nav .badge');
+                if (badge) {
+                    badge.textContent = data.cart_count;
+                } else {
+                    // Якщо бейджа ще немає — перезавантажуємо навбар
+                    const cartLink = document.querySelector('a[href*="cart"]');
+                    if (cartLink) {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'badge';
+                        newBadge.textContent = data.cart_count;
+                        cartLink.appendChild(newBadge);
+                    }
+                }
+            } else {
+                btn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                btn.style.background = '#c0392b';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="bi bi-bag-plus"></i>';
+                    btn.style.background = '';
+                }, 1200);
+            }
+        });
+}
+</script>
+{% endblock %}

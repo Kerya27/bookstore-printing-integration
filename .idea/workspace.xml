@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="47923d6d-d50f-48af-8b43-a7a3381808c1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/bookstore.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/catalog/context_processors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/catalog/management/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/catalog/management/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/catalog/management/commands/generate_orders.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/catalog/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/base_admin.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/book_form.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/books.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/dashboard.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/order_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/orders.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/admin/users.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/book_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/cabinet.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/cabinet_edit.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/cart.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/catalog.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/checkout.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/catalog/order_detail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/registration/login.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3CWGp0PdLGr1tT3efH7zStunmIh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Django Server.bookstore.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\yungk\PycharmProjects\bookstore\catalog\management" />
+      <recent name="C:\Users\yungk\PycharmProjects\bookstore\catalog" />
+      <recent name="C:\Users\yungk\PycharmProjects\bookstore\templates\catalog\admin" />
+      <recent name="C:\Users\yungk\PycharmProjects\bookstore\templates" />
+      <recent name="C:\Users\yungk\PycharmProjects\bookstore\media" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="bookstore" type="Python.DjangoServer" factoryName="Django server">
+      <module name="bookstore" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DJANGO_SETTINGS_MODULE" value="bookstore.settings" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="47923d6d-d50f-48af-8b43-a7a3381808c1" name="Changes" comment="" />
+      <created>1776494093960</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1776494093960</updated>
+      <workItem from="1776494095053" duration="7776000" />
+      <workItem from="1776507490498" duration="5134000" />
+      <workItem from="1776517144709" duration="10517000" />
+      <workItem from="1776584546894" duration="1126000" />
+      <workItem from="1776590596172" duration="2719000" />
+      <workItem from="1776640338019" duration="403000" />
+      <workItem from="1777045685018" duration="957000" />
+      <workItem from="1777631605234" duration="903000" />
+      <workItem from="1777636091832" duration="3718000" />
+      <workItem from="1778001023644" duration="439000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
