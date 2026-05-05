@@ -173,6 +173,56 @@
         background: var(--cream);
         border-top: 1px solid var(--cream-2);
     }
+
+    .section-divider {
+        height: 1px;
+        background: var(--cream-2);
+        margin: 4px 0;
+    }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: -4px;
+    }
+
+    /* Прогрес виробництва */
+    .production-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .production-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        font-size: 13px;
+    }
+
+    .production-step:last-child { border-bottom: none; }
+
+    .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: var(--cream-3);
+    }
+
+    .step-dot.done { background: #3aaa7a; }
+    .step-dot.active { background: var(--accent); }
+
+    .step-label { color: var(--ink-2); flex: 1; }
+    .step-label.done { color: var(--ink); font-weight: 500; }
+    .step-label.active { color: var(--ink); font-weight: 500; }
+
+    .step-time { font-size: 11.5px; color: var(--ink-3); }
 </style>
 {% endblock %}
 
@@ -228,6 +278,9 @@
                 {% csrf_token %}
                 <div class="printjob-body">
 
+                    <!-- Статуси -->
+                    <div class="section-label">Статуси</div>
+
                     <div class="field">
                         <label>Статус замовлення</label>
                         <select name="status">
@@ -239,10 +292,8 @@
                         </select>
                     </div>
 
-                    <div style="height: 1px; background: var(--cream-2);"></div>
-
                     <div class="field">
-                        <label>Статус друку</label>
+                        <label>Статус виробництва</label>
                         <select name="print_status">
                             {% for value, label in print_status_choices %}
                             <option value="{{ value }}" {% if print_job.status == value %}selected{% endif %}>
@@ -250,25 +301,75 @@
                             </option>
                             {% endfor %}
                         </select>
+                        <small style="color: var(--ink-3); font-size: 11.5px; margin-top: 4px; display: block;">
+                            При переході до «Друк» час початку фіксується автоматично. При «Виконано» – час завершення.
+                        </small>
                     </div>
 
-                    <div class="fields-row">
+                    <div class="section-divider"></div>
+
+                    <!-- Технологічні параметри -->
+                    <div class="section-label">Технологічні параметри</div>
+
+                    <div class="fields-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="field">
-                            <label>Початок друку</label>
-                            <input type="datetime-local" name="started_at"
-                                   value="{% if print_job.started_at %}{{ print_job.started_at|date:'Y-m-d' }}T{{ print_job.started_at|date:'H:i' }}{% endif %}">
+                            <label>Формат видання</label>
+                            <input type="text" name="format"
+                                   value="{{ print_job.format }}"
+                                   placeholder="напр. 60×84/16">
                         </div>
                         <div class="field">
-                            <label>Завершення друку</label>
-                            <input type="datetime-local" name="finished_at"
-                                   value="{% if print_job.finished_at %}{{ print_job.finished_at|date:'Y-m-d' }}T{{ print_job.finished_at|date:'H:i' }}{% endif %}">
+                            <label>Тираж (прим.)</label>
+                            <input type="number" name="circulation" min="1"
+                                   value="{{ print_job.circulation|default:'' }}"
+                                   placeholder="напр. 500">
+                        </div>
+                    </div>
+
+                    <div class="fields-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="field">
+                            <label>Спосіб друку</label>
+                            <select name="print_method">
+                                <option value="">– не вказано –</option>
+                                {% for value, label in print_method_choices %}
+                                <option value="{{ value }}" {% if print_job.print_method == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Тип паперу</label>
+                            <select name="paper_type">
+                                <option value="">– не вказано –</option>
+                                {% for value, label in paper_choices %}
+                                <option value="{{ value }}" {% if print_job.paper_type == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
 
                     <div class="field">
-                        <label>Примітки виробництва</label>
+                        <label>Тип скріплення</label>
+                        <select name="binding_type">
+                            <option value="">– не вказано –</option>
+                            {% for value, label in binding_choices %}
+                            <option value="{{ value }}" {% if print_job.binding_type == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <!-- Примітки -->
+                    <div class="field">
+                        <label>Виробничі примітки</label>
                         <textarea name="notes" rows="3"
-                                  placeholder="Особливі вимоги, нотатки...">{{ print_job.notes }}</textarea>
+                                  placeholder="Особливі вимоги, нотатки оператора...">{{ print_job.notes }}</textarea>
                     </div>
 
                 </div>
@@ -302,7 +403,7 @@
                     </span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-row-label">Друк</span>
+                    <span class="detail-row-label">Виробництво</span>
                     <span class="detail-row-value">
                         <span class="status-badge pj-{{ print_job.status }}">
                             <i class="bi bi-circle-fill"></i>
@@ -319,6 +420,111 @@
                     <span class="detail-row-value">{{ order.updated_at|date:"d.m.Y H:i" }}</span>
                 </div>
             </div>
+        </div>
+
+        <!-- Технологічні параметри (якщо заповнені) -->
+        {% if print_job.format or print_job.circulation or print_job.print_method or print_job.paper_type or print_job.binding_type %}
+        <div class="detail-card" style="margin-bottom: 0;">
+            <div class="detail-card-header">Параметри виробництва</div>
+            <div class="detail-rows">
+                {% if print_job.format %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Формат</span>
+                    <span class="detail-row-value">{{ print_job.format }}</span>
+                </div>
+                {% endif %}
+                {% if print_job.circulation %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Тираж</span>
+                    <span class="detail-row-value">{{ print_job.circulation }} прим.</span>
+                </div>
+                {% endif %}
+                {% if print_job.print_method %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Спосіб друку</span>
+                    <span class="detail-row-value">{{ print_job.get_print_method_display }}</span>
+                </div>
+                {% endif %}
+                {% if print_job.paper_type %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Папір</span>
+                    <span class="detail-row-value">{{ print_job.get_paper_type_display }}</span>
+                </div>
+                {% endif %}
+                {% if print_job.binding_type %}
+                <div class="detail-row">
+                    <span class="detail-row-label">Скріплення</span>
+                    <span class="detail-row-value">{{ print_job.get_binding_type_display }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Хронологія виробництва -->
+        <div class="detail-card" style="margin-bottom: 0;">
+            <div class="detail-card-header">Етапи виробництва</div>
+            <div class="production-steps">
+                {% with s=print_job.status %}
+
+                <div class="production-step">
+                    <div class="step-dot {% if s == 'pending' %}active{% elif s != 'pending' %}done{% endif %}"></div>
+                    <span class="step-label {% if s == 'pending' %}active{% elif s != 'pending' %}done{% endif %}">
+                        Очікує підтвердження
+                    </span>
+                </div>
+
+                <div class="production-step">
+                    <div class="step-dot {% if s == 'prepress' %}active{% elif s == 'printing' or s == 'postpress' or s == 'done' %}done{% endif %}"></div>
+                    <span class="step-label {% if s == 'prepress' %}active{% elif s == 'printing' or s == 'postpress' or s == 'done' %}done{% endif %}">
+                        Додрукарська підготовка
+                    </span>
+                </div>
+
+                <div class="production-step">
+                    <div class="step-dot {% if s == 'printing' %}active{% elif s == 'postpress' or s == 'done' %}done{% endif %}"></div>
+                    <span class="step-label {% if s == 'printing' %}active{% elif s == 'postpress' or s == 'done' %}done{% endif %}">
+                        Друк
+                    </span>
+                    {% if print_job.started_at %}
+                    <span class="step-time">{{ print_job.started_at|date:"d.m H:i" }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="production-step">
+                    <div class="step-dot {% if s == 'postpress' %}active{% elif s == 'done' %}done{% endif %}"></div>
+                    <span class="step-label {% if s == 'postpress' %}active{% elif s == 'done' %}done{% endif %}">
+                        Післядрукарська обробка
+                    </span>
+                </div>
+
+                <div class="production-step">
+                    <div class="step-dot {% if s == 'done' %}done{% endif %}"></div>
+                    <span class="step-label {% if s == 'done' %}done{% endif %}">
+                        Виконано
+                    </span>
+                    {% if print_job.finished_at %}
+                    <span class="step-time">{{ print_job.finished_at|date:"d.m H:i" }}</span>
+                    {% endif %}
+                </div>
+
+                {% endwith %}
+            </div>
+
+            <!-- Тривалість якщо є обидва часи -->
+            {% if print_job.started_at and print_job.finished_at %}
+            <div style="padding: 10px 16px; background: var(--cream); border-top: 1px solid var(--cream-2);
+                        font-size: 12.5px; color: var(--ink-3); display: flex; justify-content: space-between;">
+                <span>Тривалість виробництва</span>
+                <span style="font-weight: 500; color: var(--ink);">
+                    {% with duration=print_job.get_duration %}
+                        {% if duration %}
+                            {{ duration.days }}д {{ duration.seconds|floatformat:0 }}с
+                        {% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+            {% endif %}
         </div>
 
         <!-- Інфо про покупця -->
@@ -351,26 +557,6 @@
                 </div>
             </div>
         </div>
-
-        {% if print_job.started_at or print_job.finished_at %}
-        <div class="detail-card" style="margin-bottom: 0;">
-            <div class="detail-card-header">Хронологія друку</div>
-            <div class="detail-rows">
-                {% if print_job.started_at %}
-                <div class="detail-row">
-                    <span class="detail-row-label">Початок</span>
-                    <span class="detail-row-value">{{ print_job.started_at|date:"d.m.Y H:i" }}</span>
-                </div>
-                {% endif %}
-                {% if print_job.finished_at %}
-                <div class="detail-row">
-                    <span class="detail-row-label">Завершення</span>
-                    <span class="detail-row-value">{{ print_job.finished_at|date:"d.m.Y H:i" }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
 
     </div>
 </div>
