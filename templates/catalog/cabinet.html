@@ -81,10 +81,7 @@
         margin-top: 1px;
     }
 
-    .profile-rows {
-        display: flex;
-        flex-direction: column;
-    }
+    .profile-rows { display: flex; flex-direction: column; }
 
     .profile-row {
         display: flex;
@@ -232,11 +229,93 @@
     .status-shipped  { background: #e6f1fb; color: #185fa5; border: 1px solid #85b7eb; }
     .status-delivered{ background: #eaf3de; color: #3b6d11; border: 1px solid #97c459; }
 
-    /* Order items inside card */
-    .order-card-items {
+    /* PRODUCTION TRACKER */
+    .production-tracker {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--cream-2);
+        background: var(--cream);
+    }
+
+    .production-tracker-label {
+        font-size: 10.5px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .production-tracker-label i { font-size: 12px; }
+
+    .production-steps {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        width: 100%;
+    }
+
+    .prod-step {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        flex: 1;
+        position: relative;
     }
+
+    /* лінія між кроками */
+    .prod-step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 7px;
+        left: calc(50% + 8px);
+        right: calc(-50% + 8px);
+        height: 2px;
+        background: var(--cream-3);
+        z-index: 0;
+    }
+
+    .prod-step.done:not(:last-child)::after { background: #3aaa7a; }
+    .prod-step.active:not(:last-child)::after { background: var(--cream-3); }
+
+    .prod-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--cream-3);
+        border: 2px solid var(--cream-3);
+        position: relative;
+        z-index: 1;
+        flex-shrink: 0;
+    }
+
+    .prod-step.done .prod-dot {
+        background: #3aaa7a;
+        border-color: #3aaa7a;
+    }
+
+    .prod-step.active .prod-dot {
+        background: var(--white);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(184,92,56,0.15);
+    }
+
+    .prod-step-name {
+        font-size: 10px;
+        color: var(--ink-3);
+        text-align: center;
+        line-height: 1.2;
+        max-width: 60px;
+    }
+
+    .prod-step.done .prod-step-name { color: #2a8a5f; font-weight: 500; }
+    .prod-step.active .prod-step-name { color: var(--accent); font-weight: 500; }
+
+    /* Order items inside card */
+    .order-card-items { display: flex; flex-direction: column; }
 
     .order-card-item {
         display: grid;
@@ -424,19 +503,55 @@
                     <span class="order-number">Замовлення #{{ order.pk }}</span>
                     <div class="order-meta">
                         <span class="order-date">{{ order.created_at|date:"d.m.Y, H:i" }}</span>
-                        <span class="status-badge
-                            {% if order.status == 'new' %}status-new
-                            {% elif order.status == 'confirmed' %}status-confirmed
-                            {% elif order.status == 'printing' %}status-printing
-                            {% elif order.status == 'ready' %}status-ready
-                            {% elif order.status == 'shipped' %}status-shipped
-                            {% elif order.status == 'delivered' %}status-delivered
-                            {% endif %}">
+                        <span class="status-badge status-{{ order.status }}">
                             <i class="bi bi-circle-fill"></i>
                             {{ order.get_status_display }}
                         </span>
                     </div>
                 </div>
+
+                {# Трекер виробництва — показуємо якщо замовлення вже в роботі #}
+                {% with pj=order.print_job %}
+                {% if pj and pj.status != 'pending' %}
+                <div class="production-tracker">
+                    <div class="production-tracker-label">
+                        <i class="bi bi-printer"></i> Стан виробництва
+                    </div>
+                    <div class="production-steps">
+
+                        <div class="prod-step
+                            {% if pj.status == 'prepress' %}active
+                            {% elif pj.status == 'printing' or pj.status == 'postpress' or pj.status == 'done' %}done
+                            {% endif %}">
+                            <div class="prod-dot"></div>
+                            <span class="prod-step-name">Підготовка</span>
+                        </div>
+
+                        <div class="prod-step
+                            {% if pj.status == 'printing' %}active
+                            {% elif pj.status == 'postpress' or pj.status == 'done' %}done
+                            {% endif %}">
+                            <div class="prod-dot"></div>
+                            <span class="prod-step-name">Друк</span>
+                        </div>
+
+                        <div class="prod-step
+                            {% if pj.status == 'postpress' %}active
+                            {% elif pj.status == 'done' %}done
+                            {% endif %}">
+                            <div class="prod-dot"></div>
+                            <span class="prod-step-name">Обробка</span>
+                        </div>
+
+                        <div class="prod-step {% if pj.status == 'done' %}done{% endif %}">
+                            <div class="prod-dot"></div>
+                            <span class="prod-step-name">Готово</span>
+                        </div>
+
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
 
                 <div class="order-card-items">
                     {% for item in order.items.all %}

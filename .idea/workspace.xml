@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="47923d6d-d50f-48af-8b43-a7a3381808c1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/catalog/admin/order_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/catalog/admin/order_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/catalog/admin/base_admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/catalog/admin/base_admin.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/catalog/cabinet.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/catalog/cabinet.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +45,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -114,7 +116,10 @@
       <workItem from="1777045685018" duration="957000" />
       <workItem from="1777631605234" duration="903000" />
       <workItem from="1777636091832" duration="3718000" />
-      <workItem from="1778001023644" duration="839000" />
+      <workItem from="1778001023644" duration="2773000" />
+      <workItem from="1778493376782" duration="604000" />
+      <workItem from="1778494933941" duration="18000" />
+      <workItem from="1779701745667" duration="75000" />
     </task>
     <servers />
   </component>
