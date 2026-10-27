@@ -1,10 +1,10 @@
-# 📚 Bookstore — Django Web System with Print Production Integration
+# Bookstore — Django Web System with Print Production Integration
 
 A full-featured web system for selling printed books, built as a bachelor's diploma project. Combines a customer-facing bookstore with an admin panel and a print production workflow tracker — designed for small and mid-sized printing enterprises.
 
 ---
 
-## ✨ Features
+## Features
 
 ### Storefront
 - Book catalog with category filtering, full-text search (Ukrainian-aware), and multi-parameter sorting
@@ -30,7 +30,7 @@ A full-featured web system for selling printed books, built as a bachelor's dipl
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -42,7 +42,7 @@ A full-featured web system for selling printed books, built as a bachelor's dipl
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 # 1. Clone the repository
@@ -75,7 +75,7 @@ Admin panel: [http://127.0.0.1:8000/admin-panel/](http://127.0.0.1:8000/admin-pa
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 bookstore/
@@ -101,7 +101,7 @@ bookstore/
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 > Admin dashboard with revenue charts
 > <img width="932" height="390" alt="image" src="https://github.com/user-attachments/assets/0892f365-eebe-4192-bddc-59bea1945751" />
@@ -119,7 +119,7 @@ bookstore/
 
 ---
 
-## 🎓 About
+## About
 
 Developed as a bachelor's diploma project at Kyiv Polytechnic Institute (KPI),  
 specialty 186 — Publishing and Printing, 2025.
